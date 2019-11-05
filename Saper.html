@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        #container{
+            padding: 5px;
+            border: forestgreen solid 3px;
+            background-color: greenyellow;
+        }
+        #board{
+            display: grid;
+            grid-template-columns: repeat(auto-fill , minmax(50px , 1fr));
+            height: 500px;
+            width: 500px;
+            background-color: grey;
+        }
+        .box{
+            position: relative;
+            background-color: green;
+            text-align: center;
+            font-size: 15px;
+            padding: 15%;
+            border: lightgrey solid 3px;
+        }
+        .box > p {
+            font-size: 50px;
+            position: absolute;
+            left: 20%;
+            bottom: -130%;
+        }
+        .opened{
+            background-color: lightgreen;
+            text-align: center;
+            font-size: 15px;
+            padding: 15%;
+            border: lightgrey solid 3px;
+        }
+    </style>
+</head>
+<body>
+<center id="container">
+    <div id="board">
+
+    </div>
+</center>
+<script src="../JQuery/JQuery.js"></script>
+<script src="../Vue.js/vue.min.js"></script>
+
+
+<script>
+        const boxNums = 10;
+        const types = ['TNT' , 'normal' , 'normal' , 'normal' , 'normal' , 'normal' , 'normal' ];
+        const board = document.getElementById('board');
+        let Warnings = 0;
+
+
+        function fillBoard1() {
+            let id = 1;
+            for (let i = 0; i < boxNums; i++) {
+                for (let j = 0; j < boxNums; j++) {
+                    let boxType = types[Math.floor(Math.random()*types.length)];
+                    fillBoard2(i , j , boxType , id );
+                    id++;
+                }
+            }
+        }
+        fillBoard1();
+
+        function fillBoard2( row , col , type , id) {
+            let newDiv = document.createElement('div');
+            newDiv.setAttribute('class' , 'box');
+            newDiv.setAttribute('id' , "div"+id);
+            newDiv.setAttribute('data-type' , type);
+
+            newDiv.value = false;
+
+            newDiv.addEventListener('click' , function open() {
+                Warnings = 0;
+                if(type === 'TNT'){
+                    alert('game over');
+                }else {
+
+                    newDiv.classList.remove();
+                    newDiv.classList.add('opened');
+                    for (let i = 0; i < 8; i++) {
+                        // console.log(i);
+                        switch (i) {
+                            case 0:
+                                if(id % 10 !== 1){
+                                    id -=11;
+                                    checkNeighborhoods(id);
+                                    id +=11;
+                                }
+                                break;
+                            case 1:
+                                id -=10;
+                                checkNeighborhoods(id);
+                                id +=10;
+                                break;
+                            case 2:
+                                if(id % 10 !== 0){
+                                    id -=9;
+                                    checkNeighborhoods(id);
+                                    id +=9;
+                                }
+                                break;
+                            case 3:
+                                if(id % 10 !== 1){
+                                    id -=1;
+                                    checkNeighborhoods(id);
+                                    id +=1;
+                                }
+
+                                break;
+                            case 4:
+                                if(id % 10 !== 0) {
+                                    id += 1;
+                                    checkNeighborhoods(id);
+                                    id -= 1;
+                                }
+                                break;
+                            case 5:
+                                if(id % 10 !== 1) {
+
+                                    id += 9;
+                                    checkNeighborhoods(id);
+                                    id -= 9;
+                                }
+                                break;
+                            case 6:
+                                id +=10;
+                                checkNeighborhoods(id);
+                                id -=10;
+                                break;
+                            case 7:
+                                if(id % 10 !== 0) {
+
+                                    id += 11;
+                                    checkNeighborhoods(id);
+                                    id -= 11;
+                                }
+                                break;
+                        }
+                        newDiv.innerHTML = `<p>${Warnings}</p>`;
+                    }
+                }
+            });
+
+            board.appendChild(newDiv);
+        }
+
+        function checkNeighborhoods(id) {
+            if( document.getElementById("div"+id)){
+                let neighbor = document.getElementById("div"+id);
+                if(neighbor.getAttribute('data-type') === 'TNT'){
+                    Warnings++;
+                }
+            }
+
+        }
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div id="vue-app">
+    <label>
+        <input type="text" placeholder="write bank card code" v-model="inputVal" v-on:keyup.delete="checkLength" v-on:keyup="checkLength">
+    </label>
+    <button v-if="error">submit</button>
+    <p v-if="errorLength">The code should include 16 numbers</p>
+    <p v-if="errorLength" v-on:click="validation">This code is invalid!</p>
+</div>
+<script src="../../Vue.js/vue.min.js"></script>
+<script src="../../JQuery/JQuery.js"></script>
+    <script>
+        new Vue({
+           el: '#vue-app',
+           data:{
+               error: false,
+               errorLength: true,
+               inputVal: '',
+               same: 0,
+               cardCode: [
+                    [0,2,3,4],
+                    [5,6,7,8],
+                    [8,9,0,0],
+                    [0,0,0,0]
+                   ],
+           },
+           methods:{
+               checkLength: function () {
+                   for (let letter = 0; letter < this.inputVal.length; letter++) {
+                       if(this.inputVal[letter].charCodeAt() >= 48 && this.inputVal[letter].charCodeAt() <= 57  ){
+                           if(this.inputVal.length === 16 ){
+                               this.error = true;
+                               this.errorLength = false;
+                               break;
+                           }else{
+                               this.error = false;
+                               this.errorLength = true;
+                           }
+                       }else{
+                           this.inputVal = '';
+                           alert('write only numbers');
+
+                       }
+                   }
+               },
+
+               first4num:async function(startNum, endNum  , line) {
+                   let fourNum =  this.inputVal.slice(startNum , endNum);
+
+                   for (let element = 0; element < this.cardCode.length; element++) {
+
+                       if(this.cardCode[line][element] === parseInt(fourNum[element])){
+                           // alert();
+                           // console.log('array '+ this.cardCode[line]+' sliced ' + fourNum);
+                            this.same++;
+                       }else{
+                           this.positionElements( startNum ,line , element , fourNum);
+                           // alert('error');
+                           this.same = 0;
+
+                       }
+                   }
+                   if(this.same === 16){
+                       alert('Success!');
+                   }
+               },
+
+               positionElements: function (startNum ,  line , lineElement , fourNum) {
+                   let check = 0;
+                   for (let i = 0; i < this.cardCode.length; i++) {
+                       for (let j = 0; j < this.cardCode.length; j++) {
+                           if(parseInt(fourNum[lineElement]) === this.cardCode[i][j]){
+                               console.log(this.cardCode[Math.floor((lineElement + startNum)/4)][(lineElement + startNum)%4]);
+                               alert(`your ${lineElement + startNum + 1}th written number change with ${this.cardCode[Math.floor((lineElement + startNum)/4)][(lineElement + startNum)%4] }`);
+                           }else{
+                               check++;
+                           }
+                       }
+                   }
+                    if(check === 16){
+                        alert(`overwrite ${fourNum[lineElement]} in your input`);
+                    }
+
+               }
+           },
+           computed:{
+               validation: function () {
+                   //slice the validation function in 16 parts
+                   for (let line = 0; line < this.cardCode.length ; line++) {
+                       switch (line) {
+                           case 0:
+                               this.first4num(0 , 4 , 0);
+                               break;
+                           case 1:
+                               this.first4num(4 , 8 , 1);
+                               break;
+                           case 2:
+                               this.first4num(8 , 12 , 2);
+                               break;
+                           case 3:
+                               this.first4num(12 , 16 , 3);
+                               break;
+                       }
+                   }
+
+
+               },
+           },
+        });
+
+
+    </script>
+</body>
+</html>

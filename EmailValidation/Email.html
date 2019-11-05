@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>mail</title>
+    <style>
+
+       .container{
+           display: grid;
+           grid-template-columns: 1fr 1fr;
+           margin: 0 5vw;
+           grid-gap: 10px;
+       }
+        .container #register input{
+            margin: 5px 0;
+        }
+
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <label id="register">
+        <input type="text"     v-model="username"       v-model="lookingName" value="" placeholder="username"><br>
+        <input type="text"     v-model="email"          v-model="lookingMail"   value="" placeholder="email"><br>
+        <input type="password" v-model="password"       v-model="lookingPassword"  value="" placeholder="password"><br>
+        <input type="password" v-model="passwordRep"    v-model="lookingRepPassword"  value="" placeholder="password"><br>
+        <button v-on:click="lookingAll">Submit</button>
+        <p>Username: {{ username }}</p>
+        <p>Password: {{ password }}</p>
+        <p>Email: {{ email }}</p>
+    </label>
+    <div>
+        <h1>DataBase</h1>
+        <ol id="users">
+
+        </ol>
+    </div>
+</div>
+
+    <script src="../../JQuery/JQuery.js"></script>
+    <script src="../../Vue.js/vue.min.js"></script>
+
+    <script>
+
+        //database
+class User {
+    constructor(username , email , password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+    congratulations(){
+        const save = confirm(`Congratulations to You , ${this.username}! Do You wont to save password?`);
+    }
+}
+const usersInfo = [];
+let usersInfo_serialize = JSON.stringify(usersInfo);
+localStorage.setItem('usersInformation' , usersInfo_serialize);
+// const usersInfo_deserialize = JSON.parse(localStorage.getItem('usersInfo'));
+        new Vue({
+            el : '#register',
+            data : {
+                username: '',
+                email:'',
+                password:'',
+                passwordRep:'',
+                num: 0,
+            },
+            methods : {
+                lookingAll: function () {
+
+                        const username = this.username;
+                        const password = this.password;
+                        const mail = this.email;
+                        const passwordRep = this.passwordRep;
+
+                            if(username === '' || password === '' || mail === '' || passwordRep === ''){
+                                alert('write all boxes below');
+                            }else{
+                                passwordValidation();
+                            }
+
+
+                            function error(){
+                                alert('write email correctly');
+                            }
+                            function repetition(){
+                                alert(`We already have user with this username or email.`)
+                            }
+
+                        function passwordValidation() {
+                            const strongPassNum = /([0-9])/g;
+                            const strongPassLowercase =/([a-z])/g;
+                            const strongPassUppercase = /([A-Z])/g;
+
+                            if(!password.match(strongPassNum) || !password.match(strongPassLowercase) || !password.match(strongPassUppercase)){
+                                alert('Password must include numbers , uppercase and lowercase characters');
+                            }else if(password !== passwordRep) {
+                                alert('Passwords are different');
+                            }else{
+                                mailValidation();
+                            }
+                        }
+
+
+
+                        function mailValidation() {
+                            const correctEnd = ['@gmail.com' , '@gmail.am', '@mail.ru' , '@bk.ru' , 'ysu.am'];
+
+                            if(mail.match('@') && mail.search('@') > 0){
+                                const startPart = mail.search('@');
+                                const endPart = mail.slice(startPart , mail.length);
+                                let choice = 0;
+
+                                for(end of correctEnd){
+                                    if(end === endPart){
+                                        storageUserPass();
+                                    }else{
+                                        choice++;
+                                    }
+                                }
+                                if(choice === correctEnd.length){
+                                    error();
+                                }
+                            }else{
+                                error();
+                            }
+                        }
+                        function storageUserPass() {
+                            let valid = 0;
+                            let user = new User(username,mail,password);
+                            for(let oldUser of JSON.parse(localStorage.getItem('usersInformation'))){
+                                if(oldUser.username === user.username || oldUser.email === user.email || oldUser.password === user.password){
+                                    repetition();
+                                    break;
+                                }else{
+                                    valid++;
+                                }
+                            }
+                            if(valid === JSON.parse(localStorage.getItem('usersInformation')).length){
+                                alert('Your passwords are in storage');
+                               usersInfo.push(user);
+                                usersInfo_serialize = JSON.stringify(usersInfo);
+                                localStorage.setItem('usersInformation' , usersInfo_serialize);
+                                let usersInfo_deserialize = JSON.parse(localStorage.getItem('usersInformation'));
+                                $('#users').append("<li>Username: " +user.username+" | Password: "+user.password +'</li>');
+                                // break
+                            }
+                        }
+                    }
+                },
+            });
+
+document.g
+
+
+    </script>
+</body>
+</html>
